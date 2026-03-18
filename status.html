@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Status — Zuki</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e0e;
+      --surface: #161616;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --muted: #767676;
+      --accent: #c8c8c8;
+      --accent-dim: #6a6a6a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 300;
+      font-size: 18px;
+      line-height: 1.8;
+      min-height: 100vh;
+      padding: 0 1.5rem;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='8.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 6rem 0 8rem;
+    }
+
+    .fade { animation: fadeUp 0.7s ease both; }
+    .d1  { animation-delay: 0.1s; }
+    .d2  { animation-delay: 0.2s; }
+    .d3  { animation-delay: 0.3s; }
+    .d4  { animation-delay: 0.4s; }
+    .d5  { animation-delay: 0.5s; }
+    .d6  { animation-delay: 0.6s; }
+    .d7  { animation-delay: 0.7s; }
+    .d8  { animation-delay: 0.8s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin-bottom: 1.2rem;
+    }
+
+    h1 {
+      font-size: clamp(3.5rem, 8vw, 5.5rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      color: var(--text);
+    }
+
+    h1 span { font-style: italic; }
+
+    /* ── status indicator beside h1 ── */
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 1.4rem;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      transition: color 0.4s, border-color 0.4s;
+      position: relative;
+
+    }
+
+    .status-pill.online  { color: #a8c8a0; border-color: #3a4a38; }
+    .status-pill.offline { color: #c8a0a0; border-color: #4a3838; }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .status-pill.online .status-dot {
+      animation: blink 2.4s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.35; }
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 3rem 0;
+    }
+
+    h2 {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+    }
+
+    /* ── stat grid ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .stat {
+      background: var(--bg);
+      padding: 1.6rem 1.4rem;
+    }
+
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin-bottom: 0.6rem;
+    }
+
+    .stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem;
+      font-weight: 300;
+      line-height: 1;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .stat-value em {
+      font-size: 1rem;
+      font-style: normal;
+      color: var(--muted);
+      margin-left: 3px;
+    }
+
+    .stat-value.loading {
+      color: var(--accent-dim);
+      font-size: 1.8rem;
+    }
+
+    /* ── last updated line ── */
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.2rem;
+    }
+
+    .meta-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.64rem;
+      letter-spacing: 0.1em;
+      color: var(--accent-dim);
+    }
+
+    /* ── error note ── */
+    .error-note {
+      opacity: 0;
+      pointer-events: none;
+      margin-top: 1.6rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.66rem;
+      letter-spacing: 0.06em;
+      color: #c8a0a0;
+      line-height: 1.7;
+      transition: opacity 0.4s ease;
+    }
+
+    .error-note.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── footer ── */
+    footer {
+      margin-top: 6rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-brand { font-size: 1.1rem; color: var(--muted); }
+    .footer-brand strong { font-style: italic; font-weight: 300; color: var(--accent); }
+
+    .footer-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover { color: var(--accent); }
+
+    @media (max-width: 520px) {
+      .stats { grid-template-columns: 1fr; }
+      .title-row { align-items: flex-start; flex-direction: column; gap: 0.6rem; }
+    }
+  </style>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+  <div class="wrap">
+
+    <p class="eyebrow fade d1">Discord Bot · Status</p>
+
+    <div class="title-row fade d2">
+      <h1><span>Status</span></h1>
+      <span class="status-pill" id="status-pill">
+        <span class="status-dot"></span>
+        <span id="status-text">—</span>
+      </span>
+    </div>
+
+    <div class="divider fade d3"></div>
+
+    <h2 class="fade d4">Overview</h2>
+
+    <div class="stats fade d5">
+      <div class="stat">
+        <div class="stat-label">Servers</div>
+        <div class="stat-value loading" id="stat-servers">…</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Users</div>
+        <div class="stat-value loading" id="stat-users">…</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Uptime</div>
+        <div class="stat-value loading" id="stat-uptime">…</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Ping</div>
+        <div class="stat-value loading" id="stat-ping">…</div>
+      </div>
+    </div>
+
+    <div class="meta-row fade d6">
+      <span class="meta-text" id="last-updated">Fetching…</span>
+      <span class="meta-text">Refreshes every 30s</span>
+    </div>
+
+    <div class="error-note" id="error-note">
+      ♥ Unable to reach Zuki right now.
+    </div>
+
+    <footer class="fade d7">
+      <span class="footer-brand">— <strong>Zuki</strong></span>
+      <div style="display:flex;gap:1.5rem;">
+        <a class="footer-link" href="index.html">&larr; Home Page</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const STATUS_URL = 'https://zukigg.duckdns.org';
+
+    function formatUptime(s) {
+      if (s < 60)   return `${s}<em>s</em>`;
+      if (s < 3600) return `${Math.floor(s / 60)}<em>m</em>`;
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      return `${h}<em>h</em> ${m}<em>m</em>`;
+    }
+
+    function setOffline() {
+      const pill = document.getElementById('status-pill');
+      pill.className = 'status-pill offline';
+      document.getElementById('status-text').textContent = 'Offline';
+      ['stat-servers', 'stat-uptime', 'stat-ping', 'stat-users'].forEach(id => {
+        const el = document.getElementById(id);
+        el.className = 'stat-value loading';
+        el.textContent = '—';
+      });
+      document.getElementById('error-note').classList.add('visible');
+    }
+
+    async function fetchStatus() {
+      try {
+        const res = await fetch(STATUS_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error();
+        const d = await res.json();
+
+        const pill = document.getElementById('status-pill');
+        pill.className = 'status-pill ' + (d.online ? 'online' : 'offline');
+        document.getElementById('status-text').textContent = d.online ? 'Online' : 'Offline';
+
+        const servers = document.getElementById('stat-servers');
+        servers.className = 'stat-value';
+        servers.textContent = d.serverCount ?? '—';
+
+        const uptime = document.getElementById('stat-uptime');
+        uptime.className = 'stat-value';
+        uptime.innerHTML = formatUptime(d.uptime ?? 0);
+
+        const ping = document.getElementById('stat-ping');
+        ping.className = 'stat-value';
+        ping.innerHTML = d.ping != null ? `${d.ping}<em>ms</em>` : '—';
+
+        const users = document.getElementById('stat-users');
+        users.className = 'stat-value';
+        users.textContent = d.userCount ?? '—';
+
+        const now = new Date();
+        document.getElementById('last-updated').textContent =
+          `Last updated — ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+
+        document.getElementById('error-note').classList.remove('visible');
+      } catch {
+        setOffline();
+      }
+    }
+
+    fetchStatus();
+    setInterval(fetchStatus, 30000);
+  </script>
+</body>
+</html>
